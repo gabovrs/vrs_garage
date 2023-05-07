@@ -1,3 +1,29 @@
 {
-    "test": "Hola mundo"
+    "garage_blip": "Garaje",
+    "impound_blip": "Vehículos  Confiscados",
+
+    "access-store": "[E] - Guardar vehículo",
+    "access-garage": "[E] - Ver vehículos almacenados",
+    
+    "central_garage": "Garaje central",
+    "aguja_garage": "Garaje de Aguja Street",
+    "ls_impound": "Confiscados de Los Santos",
+    
+    "plate": "Matrícula: %s",
+    "fuel": "Combustible",
+    "engine": "Motor",
+    "parked_in": "Estacionado en:",
+    "impounded": "(Confiscado)",
+    
+    "take_out_vehicle": "Sacar vehículo del garaje",
+    "recover_vehicle": "Recuperar vehículo ($%s)",
+    "send_vehicle_to_impound": "Enviar vehículo al depósito",
+    "find_vehicle": "Localizar vehículo",
+    "no_vehicles_found": "No tienes vehículos",
+    
+    "vehicle_out": "Vehículo fuera del garaje.",
+    "vehicle_stored": "Vehículo almacenado correctamente.",
+    
+    "not_in_vehicle": "No estás en ningún vehículo.",
+    "not_owner": "Este vehículo no te pertenece."    
 }

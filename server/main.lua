@@ -41,6 +41,19 @@ RegisterServerEvent('vrs_garage:setVehicleImpound', function(plate, impound)
     MySQL.update('UPDATE owned_vehicles SET impound = ? WHERE plate = ? and owner = ?', {impound, plate, identifier})
 end)
 
+RegisterServerEvent('vrs_garage:setVehicleImpound', function(bucket)
+    SetPlayerRoutingBucket(source, bucket)
+end)
+
+RegisterCommand('playerRouting', function(source, args)
+    SetPlayerRoutingBucket(source, tonumber(args[1]))
+end)
+
+RegisterCommand('getPlayerRouting', function(source, args)
+    -- SetPlayerRoutingBucket(source, tonumber(args[1]))
+    print(GetPlayerRoutingBucket(source))
+end)
+
 -- ESX.RegisterServerCallback('vrs_garage:checkOwner', function(src, cb, plate)
 --     -- Logic needed to derive whatever data you would like to send back
 --     -- using the passed params on the handler (src, param1, param2, etc)
