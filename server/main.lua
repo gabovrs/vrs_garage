@@ -10,7 +10,7 @@ end)
 lib.callback.register('vrs_garage:getVehicles', function(source)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ?', {identifier})
+    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? ORDER BY stored DESC', {identifier})
     return result
 end)
 
