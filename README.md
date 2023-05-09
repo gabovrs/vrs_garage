@@ -24,7 +24,6 @@ Simple and optimized garage system.
 - Option to find lost vehicles
 - Live previews
 - Unique spaces in each garage
-- Save vehicle deformations
 - Saves engine damage
 - Save the fuel
 - Save body damage
