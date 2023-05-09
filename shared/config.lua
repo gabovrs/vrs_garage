@@ -2,7 +2,12 @@ Config = {}
 
 Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
 
-Config.Debug = false
+Config.DefaultPed = {
+    model = 's_m_m_dockwork_01',
+    task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT' --animation https://gtaforums.com/topic/796181-list-of-scenarios-for-peds/
+}
+
+Config.Debug = false -- enable the drawing of locations
 
 Config.Fine = 50000
 
@@ -19,10 +24,12 @@ Config.ImpoundBlip = {
 }
 
 Config.Garages = {
+    -- },
     ['elgin'] = {
         access = vec4(214.5288, -807.0486, 30.8031, 342.1742),
         store = vec4(216.8447, -786.5744, 30.8161, 340.5844),
         spawn = vec4(230.7546, -795.9514, 30.5859, 160.6045),
+        pedModel = 'a_f_y_femaleagent'
     },
     ['aguja'] = {
         access = vec4(-1183.1499, -1508.2714, 4.3797, 308.6074),

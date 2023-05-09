@@ -378,7 +378,10 @@ end)
 
 function CreateGarages()
     for k, v in pairs(Config.Garages) do
-        local pedModel = 's_m_m_dockwork_01'
+        local pedModel = Config.DefaultPed.model
+        if v.pedModel then
+            pedModel = v.pedModel
+        end
         lib.requestModel(pedModel)
 
         local ped = CreatePed(0, GetHashKey(pedModel), vector3(v.access.x, v.access.y, v.access.z - 1.0), v.access.w,
@@ -386,6 +389,7 @@ function CreateGarages()
         FreezeEntityPosition(ped, true)
         SetEntityInvincible(ped, true)
         SetBlockingOfNonTemporaryEvents(ped, true)
+        TaskStartScenarioInPlace(ped, Config.DefaultPed.task, true, true)
 
         local blip = AddBlipForCoord(v.store.x, v.store.y)
 
