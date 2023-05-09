@@ -72,9 +72,9 @@ function CustomSQL(type, action, placeholder)
     local result = nil
     if Config.MySQL == 'oxmysql' then
         if type == 'query' then
-            result = MySQL.query.await(action, placeholder)
+            result = exports.oxmysql:query_async(action, placeholder)
         elseif type == 'update' then
-            result = MySQL.update(action, placeholder)
+            result = exports.oxmysql:update(action, placeholder)
         end
     elseif Config.MySQL == 'mysql-async' then
         if type == 'query' then
