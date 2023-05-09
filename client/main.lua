@@ -4,13 +4,12 @@ local previewVehicle = nil
 local inPreviewMode = false
 
 function onEnter(self)
-    local ped = PlayerPedId()
-    lib.showTextUI(locale('access-' .. self.name), {icon = self.icon})
-    -- print('entered zone', self.id)
+    lib.showTextUI(locale('access-' .. self.name), {
+        icon = self.icon
+    })
 end
 
 function onExit(self)
-    -- print('exited zone', self.id)
     lib.hideTextUI()
 end
 
@@ -18,11 +17,9 @@ function inside(self)
     if IsControlJustReleased(0, 38) then
         TriggerEvent('vrs_garage:access-' .. self.name, self)
     end
-    -- print('you are inside zone ' .. self.id)
 end
 
 function spawnVehicle(vehicleData, plate, coords)
-    -- TODO: Revisar si las coordenadas de spawn estan sin obstaculos
     if not lib.getClosestVehicle(vector3(coords), 5.0, false) then
         ESX.Game.SpawnVehicle(GetDisplayNameFromVehicleModel(vehicleData.model), vector3(coords), coords.w,
             function(veh)
@@ -65,23 +62,20 @@ RegisterNetEvent('vrs_garage:takeOutVehicle', function(args)
     end, args.plate)
 end)
 
-RegisterNetEvent('vrs_garage:sendVehicleConfiscated', function(plate)
-    TriggerServerEvent('vrs_garage:setVehicleImpound', plate, true)
+RegisterNetEvent('vrs_garage:sendVehicleConfiscated', function(targetPlate)
+    TriggerServerEvent('vrs_garage:setVehicleImpound', targetPlate, true)
     lib.notify({
         description = locale('vehicle_sent_to_impounded'),
         type = 'info'
     })
-    plate = string.gsub(plate, "%s+", "")
     local vehicles = ESX.Game.GetVehicles()
     for i = 1, #vehicles do
         local vehicle = vehicles[i]
         if DoesEntityExist(vehicle) then
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehiclePlate = GetVehicleNumberPlateText(vehicle)
-            vehiclePlate = string.gsub(vehiclePlate, "%s+", "")
-            if vehiclePlate == plate then
+            if string.gsub(vehiclePlate, "%s+", "") == string.gsub(targetPlate, "%s+", "") then
                 DeleteVehicle(vehicle)
-                -- print('Borrando auto', vehicle)
             end
         end
     end
@@ -95,7 +89,7 @@ RegisterNetEvent('vrs_garage:findVehicle', function(targetPlate)
         if DoesEntityExist(vehicle) then
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehiclePlate = GetVehicleNumberPlateText(vehicle)
-            if vehiclePlate == targetPlate then
+            if string.gsub(vehiclePlate, "%s+", "") == string.gsub(targetPlate, "%s+", "") then
                 SetNewWaypoint(vehicleCoords.x, vehicleCoords.y)
                 found = true
                 break
@@ -120,10 +114,10 @@ function ExitPreviewMode()
     if inPreviewMode then
         inPreviewMode = false
         RenderScriptCams(false, true, 1000, true, true)
-        TriggerServerEvent('vrs_garage:setVehicleImpound', 0)
+        TriggerServerEvent('vrs_garage:setPlayerRoutingBucket', 0)
         if previewVehicle then
             DeleteVehicle(previewVehicle)
-            previewVehicle = nil 
+            previewVehicle = nil
         end
     end
 end
@@ -176,7 +170,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                             local options = {}
                             if v.stored == 1 then
                                 inPreviewMode = true
-                                TriggerServerEvent('vrs_garage:setVehicleImpound', 15)
+                                TriggerServerEvent('vrs_garage:setRandomPlayerRoutingBucket')
                                 Wait(100)
                                 if previewVehicle then
                                     DeleteVehicle(previewVehicle)
@@ -204,6 +198,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                     event = 'vrs_garage:takeOutVehicle'
                                 })
                             else
+                                ExitPreviewMode()
                                 table.insert(options, {
                                     title = locale('send_vehicle_to_impound'),
                                     icon = 'warehouse',
@@ -223,14 +218,14 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                 menu = 'garage_vehicles',
                                 title = vehicleTitle,
                                 options = options,
-                                canClose = false,
+                                canClose = false
                                 -- onExit = function()
                                 --     ExitPreviewMode()
                                 -- end
                             })
 
                             lib.showContext('garage_vehicle_options')
-                        end,
+                        end
                     })
                 end
             end
@@ -290,10 +285,10 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
 end)
 
 RegisterNetEvent('vrs_garage:access-impound', function(zone)
-    lib.callback('vrs_garage:getVehicles', false, function(vehicles)
+    lib.callback('vrs_garage:getImpoundedVehicles', false, function(vehicles)
         local options = {}
-        for k, v in pairs(vehicles) do
-            if v.impound then
+        if #vehicles > 0 then
+            for k, v in pairs(vehicles) do
                 local vehicleData = json.decode(v.vehicle)
                 local vehicleTitle = GetLabelText(GetMakeNameFromVehicleModel(vehicleData.model)) .. ' - ' ..
                                          GetLabelText(GetDisplayNameFromVehicleModel(vehicleData.model))
@@ -334,7 +329,14 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
                         lib.showContext('garage_vehicle_options')
                     end
                 })
+
             end
+        else
+            table.insert(options, {
+                title = locale('no_vehicles_found'),
+                icon = 'x',
+                disabled = true
+            })
         end
 
         lib.registerContext({
@@ -351,8 +353,18 @@ RegisterNetEvent('vrs_garage:recoverVehicle', function(args)
     lib.callback('vrs_garage:getVehicle', false, function(vehicle)
         if vehicle then
             if vehicle.impound == 1 then
-                local vehicleData = json.decode(vehicle.vehicle)
-                spawnVehicle(vehicleData, vehicle.plate, Config.Impounds[args.zone.index].spawn)
+                lib.callback('vrs_garage:canPay', false, function(canPay)
+                    if canPay then
+                        local vehicleData = json.decode(vehicle.vehicle)
+                        spawnVehicle(vehicleData, vehicle.plate, Config.Impounds[args.zone.index].spawn)
+                        TriggerServerEvent('vrs_garage:setVehicleOut', vehicle.plate, false)
+                    else
+                        lib.notify({
+                            description = locale('not_enought_money'),
+                            type = 'error'
+                        })
+                    end
+                end, Config.Fine)
             else
                 lib.notify({
                     description = locale('vehicle_not_impound'),
@@ -365,7 +377,6 @@ end)
 
 function CreateGarages()
     for k, v in pairs(Config.Garages) do
-
         local pedModel = 's_m_m_dockwork_01'
         lib.requestModel(pedModel)
 
@@ -394,7 +405,7 @@ function CreateGarages()
             icon = 'warehouse',
             coords = v.access,
             radius = 3,
-            debug = true,
+            debug = Config.Debug,
             inside = inside,
             onEnter = onEnter,
             onExit = onExit
@@ -406,7 +417,7 @@ function CreateGarages()
             icon = 'square-parking',
             coords = v.store,
             radius = 10,
-            debug = true,
+            debug = Config.Debug,
             inside = inside,
             onEnter = onEnter,
             onExit = onExit
@@ -416,6 +427,15 @@ end
 
 function CreateImpounds()
     for k, v in pairs(Config.Impounds) do
+        local pedModel = 's_m_m_dockwork_01'
+        lib.requestModel(pedModel)
+
+        local ped = CreatePed(0, GetHashKey(pedModel), vector3(v.access.x, v.access.y, v.access.z - 1.0), v.access.w,
+            false, false)
+        FreezeEntityPosition(ped, true)
+        SetEntityInvincible(ped, true)
+        SetBlockingOfNonTemporaryEvents(ped, true)
+
         local blip = AddBlipForCoord(v.access.x, v.access.y)
 
         SetBlipSprite(blip, Config.ImpoundBlip.sprite)
@@ -433,7 +453,7 @@ function CreateImpounds()
             name = 'impound',
             coords = v.access,
             radius = 3,
-            debug = true,
+            debug = Config.Debug,
             inside = inside,
             onEnter = onEnter,
             onExit = onExit

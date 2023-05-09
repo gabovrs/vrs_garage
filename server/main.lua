@@ -10,10 +10,27 @@ lib.callback.register('vrs_garage:getVehicles', function(source)
     return result
 end)
 
+lib.callback.register('vrs_garage:getImpoundedVehicles', function(source)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local identifier = xPlayer.getIdentifier()
+    local result = MySQL.query.await('SELECT * FROM owned_vehicles WHERE owner = ? and impound = 1', {identifier})
+    return result
+end)
+
+lib.callback.register('vrs_garage:canPay', function(source, amount)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    local PlayerMoney = xPlayer.getMoney() -- Get the Current Player`s Balance.
+    if PlayerMoney >= amount then -- check if the Player`s Money is more or equal to the cost.
+        xPlayer.removeMoney(amount) -- remove Cost from balance
+        return true
+    else
+        return false
+    end
+end)
+
 lib.callback.register('vrs_garage:getVehicle', function(source, plate)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    print(plate, identifier)
     local result = MySQL.query.await('SELECT * FROM owned_vehicles WHERE plate = ? and owner = ?', {plate, identifier})
     return result[1]
 end)
@@ -21,18 +38,20 @@ end)
 RegisterServerEvent('vrs_garage:updateVehicle', function(plate, vehicle, parking, stored)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    MySQL.update('UPDATE owned_vehicles SET vehicle = ?, parking = ?, stored = ? WHERE plate = ? and owner = ?', {vehicle, parking, stored, plate, identifier}, function(affectedRows)
-        if affectedRows then
-            -- TriggerClientEvent('ox_lib:notify', source, ...)
-            print(affectedRows)
-        end
-    end)
+    MySQL.update('UPDATE owned_vehicles SET vehicle = ?, parking = ?, stored = ? WHERE plate = ? and owner = ?',
+        {vehicle, parking, stored, plate, identifier}, function(affectedRows)
+            if affectedRows then
+                -- TriggerClientEvent('ox_lib:notify', source, ...)
+                print(affectedRows)
+            end
+        end)
 end)
 
 RegisterServerEvent('vrs_garage:setVehicleOut', function(plate, stored)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    MySQL.update('UPDATE owned_vehicles SET stored = ?, parking = NULL, impound = 0 WHERE plate = ? and owner = ?', {stored, plate, identifier})
+    MySQL.update('UPDATE owned_vehicles SET stored = ?, parking = NULL, impound = NULL WHERE plate = ? and owner = ?',
+        {stored, plate, identifier})
 end)
 
 RegisterServerEvent('vrs_garage:setVehicleImpound', function(plate, impound)
@@ -41,29 +60,9 @@ RegisterServerEvent('vrs_garage:setVehicleImpound', function(plate, impound)
     MySQL.update('UPDATE owned_vehicles SET impound = ? WHERE plate = ? and owner = ?', {impound, plate, identifier})
 end)
 
-RegisterServerEvent('vrs_garage:setVehicleImpound', function(bucket)
+RegisterServerEvent('vrs_garage:setPlayerRoutingBucket', function(bucket)
+    if not bucket then
+        bucket = math.random(1000)
+    end
     SetPlayerRoutingBucket(source, bucket)
 end)
-
-RegisterCommand('playerRouting', function(source, args)
-    SetPlayerRoutingBucket(source, tonumber(args[1]))
-end)
-
-RegisterCommand('getPlayerRouting', function(source, args)
-    -- SetPlayerRoutingBucket(source, tonumber(args[1]))
-    print(GetPlayerRoutingBucket(source))
-end)
-
--- ESX.RegisterServerCallback('vrs_garage:checkOwner', function(src, cb, plate)
---     -- Logic needed to derive whatever data you would like to send back
---     -- using the passed params on the handler (src, param1, param2, etc)
---     MySQL.query('SELECT owner FROM owned_vehicles WHERE plate = ?', {plate}, function(result)
---         if result then
---             cb(true)
---         else
---             cb(false)
---         end
---     end)
---     -- Send back our meme data to client handler
---     -- cb(myMemeServer)
--- end)
