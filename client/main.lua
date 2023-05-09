@@ -1,3 +1,4 @@
+ESX = exports['es_extended']:getSharedObject()
 lib.locale()
 local cam = nil
 local previewVehicle = nil

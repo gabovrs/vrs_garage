@@ -2,14 +2,13 @@ fx_version 'adamant'
 
 game 'gta5'
 
-description 'Garage system by VRS'
+description 'Simple Garage System'
 lua54 'yes'
-version '1.0'
+version 'v1.0.0'
 
 author 'VRS'
 
 shared_scripts { 
-	'@es_extended/imports.lua',
 	'@ox_lib/init.lua',
 	'shared/config.lua'
 }
@@ -19,7 +18,6 @@ client_scripts {
 }
 
 server_scripts {
-	'@oxmysql/lib/MySQL.lua',
 	'server/main.lua'
 }
 

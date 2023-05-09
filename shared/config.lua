@@ -1,5 +1,7 @@
 Config = {}
 
+Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
+
 Config.Debug = false
 
 Config.Fine = 50000
