@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS `owned_vehicles` (
   `stored` tinyint(4) NOT NULL DEFAULT 0,
   `parking` varchar(60) DEFAULT NULL,
   `impound` tinyint(4) DEFAULT 0,
+  `job` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`plate`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
