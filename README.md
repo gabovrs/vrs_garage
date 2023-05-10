@@ -22,6 +22,11 @@ Simple and optimized garage system.
 ## Features
 
 - System to prevent vehicle duplication
+- Possibility to buy vehicles for jobs
+- Special garage for jobs with whitelist and without whitelist
+- Functionality to transfer vehicles between garages with pricing
+- Custom naming of add-on vehicles
+- PED customization and animations in each location
 - [Roouting Bucket](https://cookbook.fivem.net/2020/11/27/routing-buckets-split-game-state/) to avoid vehicle congestion
 - Option to find lost vehicles
 - Live previews
