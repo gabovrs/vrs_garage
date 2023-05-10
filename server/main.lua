@@ -1,5 +1,5 @@
 ESX = exports['es_extended']:getSharedObject()
-
+--
 lib.versionCheck('gabovrs/vrs_garage')
 
 lib.callback.register('vrs_garage:checkOwner', function(source, plate)

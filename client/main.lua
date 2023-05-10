@@ -5,6 +5,14 @@ local zoneIndex = nil
 local previewVehicle = nil
 local inPreviewMode = false
 
+RegisterNetEvent('esx:playerLoaded')
+AddEventHandler('esx:playerLoaded',function(xPlayer, isNew, skin)
+ -- ESX.PlayerData = xPlayer
+    CreateGarages()
+    CreateImpounds()
+    CreateJobGarages()
+end)
+
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
     ESX.PlayerData.job = job
@@ -757,10 +765,3 @@ for job, vehicles in pairs(Config.JobVehicles) do
         end
     })
 end
-
-Citizen.CreateThread(function()
-    DoScreenFadeIn(0)
-    CreateGarages()
-    CreateImpounds()
-    CreateJobGarages()
-end)

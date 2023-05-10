@@ -10,7 +10,7 @@ Config.JobVehicleShopEnabled = true -- enable the drawing of locations
 
 Config.Debug = false -- enable the drawing of locations
 
-Config.FinePricePrice = 50
+Config.FinePrice = 50
 
 Config.TransferVehiclePrice = 200
 
