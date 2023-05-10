@@ -2,14 +2,22 @@ Config = {}
 
 Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
 
+Config.PedEnabled = true
+
+Config.JobGarajesEnabled = true -- enable the drawing of locations
+
+Config.JobVehicleShopEnabled = true -- enable the drawing of locations
+
+Config.Debug = false -- enable the drawing of locations
+
+Config.FinePricePrice = 50
+
+Config.TransferVehiclePrice = 200
+
 Config.DefaultPed = {
     model = 's_m_m_dockwork_01',
     task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT' --animation https://gtaforums.com/topic/796181-list-of-scenarios-for-peds/
 }
-
-Config.Debug = false -- enable the drawing of locations
-
-Config.Fine = 50000
 
 Config.GarageBlip = {
     sprite = 50,
@@ -23,13 +31,54 @@ Config.ImpoundBlip = {
     colour = 81
 }
 
+Config.VehiclesNames = {
+    ['evo9'] = 'Mitsubishi evo 9'
+}
+
+Config.JobVehicles = {
+    ['police'] = {
+        ['police2'] = {price = 5000},
+        ['police3'] = {price = 10000},
+    }
+}
+
+Config.JobGarajes = {
+    ['police'] = {
+        ped = {
+            model = 'csb_trafficwarden',
+            task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT'
+        },
+        locations = {
+            ['vespucci_police'] = {
+                access = vec4(440.3128, -1013.3806, 28.6250, 152.6308),
+                store = vec4(423.4687, -1021.6505, 28.9481, 88.9128),
+                spawn = vec4(450.7397, -1019.5090, 28.4583, 92.3000)
+            }
+        }
+    },
+    ['ambulance'] = {
+        ped = {
+            model = 'csb_trafficwarden',
+            task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT'
+        },
+        locations = {
+            ['strawberry_ambulance'] = {
+                access = vec4(353.1519, -603.6036, 28.7761, 267.1620),
+                store = vec4(365.2415, -591.6791, 28.6921, 343.2072),
+                spawn = vec4(380.5848, -585.6525, 28.6481, 201.6172)
+            }
+        }
+    }
+}
+
 Config.Garages = {
-    -- },
     ['elgin'] = {
         access = vec4(214.5288, -807.0486, 30.8031, 342.1742),
         store = vec4(216.8447, -786.5744, 30.8161, 340.5844),
         spawn = vec4(230.7546, -795.9514, 30.5859, 160.6045),
-        pedModel = 'a_f_y_femaleagent'
+        ped = {
+            model = 'a_f_y_femaleagent',
+        }
     },
     ['aguja'] = {
         access = vec4(-1183.1499, -1508.2714, 4.3797, 308.6074),
