@@ -7,7 +7,7 @@ local inPreviewMode = false
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded',function(xPlayer, isNew, skin)
- -- ESX.PlayerData = xPlayer
+    ESX.PlayerData = xPlayer
     CreateGarages()
     CreateImpounds()
     CreateJobGarages()
@@ -699,6 +699,7 @@ function CreateJobGarages()
                     index = garage,
                     name = 'garage-job',
                     job = job,
+                    icon = 'warehouse',
                     coords = w.access,
                     radius = 3,
                     debug = Config.Debug,
