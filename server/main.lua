@@ -30,10 +30,8 @@ end)
 lib.callback.register('vrs_garage:canPay', function(source, amount)
     local xPlayer = ESX.GetPlayerFromId(source)
     local PlayerMoney = xPlayer.getMoney() -- Get the Current Player`s Balance.
-    print(PlayerMoney >= amount)
     if PlayerMoney >= amount then -- check if the Player`s Money is more or equal to the cost.
         xPlayer.removeMoney(amount) -- remove Cost from balance
-        -- xPlayer.removeAccountMoney('money', money)
         return true
     else
         return false
@@ -87,7 +85,6 @@ RegisterServerEvent('vrs_garage:setPlayerRoutingBucket', function(bucket)
     if not bucket then
         bucket = math.random(1000)
     end
-    print(bucket)
     SetPlayerRoutingBucket(source, bucket)
 end)
 
