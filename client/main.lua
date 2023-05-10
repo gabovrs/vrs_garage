@@ -6,7 +6,7 @@ local previewVehicle = nil
 local inPreviewMode = false
 
 RegisterNetEvent('esx:playerLoaded')
-AddEventHandler('esx:playerLoaded',function(xPlayer, isNew, skin)
+AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
     ESX.PlayerData = xPlayer
     CreateGarages()
     CreateImpounds()
@@ -54,16 +54,15 @@ end
 
 function spawnVehicle(vehicleData, plate, coords)
     if not lib.getClosestVehicle(vector3(coords), 5.0, false) then
-        ESX.Game.SpawnVehicle(vehicleData.model, vector3(coords), coords.w,
-            function(veh)
-                SetPedIntoVehicle(PlayerPedId(), veh, -1)
-                lib.setVehicleProperties(veh, vehicleData)
-                lib.notify({
-                    description = locale('vehicle_out'),
-                    type = 'success'
-                })
-                TriggerServerEvent('vrs_garage:setVehicleOut', plate, false)
-            end)
+        ESX.Game.SpawnVehicle(vehicleData.model, vector3(coords), coords.w, function(veh)
+            SetPedIntoVehicle(PlayerPedId(), veh, -1)
+            lib.setVehicleProperties(veh, vehicleData)
+            lib.notify({
+                description = locale('vehicle_out'),
+                type = 'success'
+            })
+            TriggerServerEvent('vrs_garage:setVehicleOut', plate, false)
+        end)
     else
         lib.notify({
             description = locale('vehicles_in_zone'),
@@ -71,6 +70,45 @@ function spawnVehicle(vehicleData, plate, coords)
         })
     end
 end
+
+RegisterNetEvent('vrs_garage:impoundVehicle', function()
+    local ped = PlayerPedId()
+    local closestVehicle = lib.getClosestVehicle(GetEntityCoords(ped), Config.ImpoundCommand.radius, false)
+    if closestVehicle then
+        if not IsPedInAnyVehicle(ped) then
+            if lib.progressBar({
+                duration = 8000,
+                label = locale('impounding_progress'),
+                useWhileDead = false,
+                canCancel = true,
+                disable = {
+                    move = true,
+                    combat = true,
+                    car = true
+                },
+                anim = {
+                    dict = 'mini@repair',
+                    clip = 'fixing_a_ped'
+                },
+            }) then
+                TriggerServerEvent('vrs_garage:setVehicleImpound', GetVehicleNumberPlateText(closestVehicle), true)
+                SetEntityAsMissionEntity(closestVehicle, true, true)
+                NetworkFadeOutEntity(closestVehicle, true, true)
+                Wait(1000)
+                DeleteVehicle(closestVehicle)
+                lib.notify({
+                    description = locale('vehicle_impounded'),
+                    type = 'success'
+                })
+            end
+        end
+    else
+        lib.notify({
+            description = locale('no_vehicles_nearby'),
+            type = 'error',
+        })
+    end
+end)
 
 RegisterNetEvent('vrs_garage:takeOutVehicle', function(args)
     DoScreenFadeOut(200)
@@ -95,7 +133,7 @@ RegisterNetEvent('vrs_garage:takeOutVehicle', function(args)
     end, args.plate)
 end)
 
-RegisterNetEvent('vrs_garage:sendVehicleConfiscated', function(targetPlate)
+RegisterNetEvent('vrs_garage:sendVehicleImpound', function(targetPlate)
     TriggerServerEvent('vrs_garage:setVehicleImpound', targetPlate, true)
     lib.notify({
         description = locale('vehicle_sent_to_impounded'),
@@ -241,7 +279,7 @@ function GetVehicleMetaData(vehicleData)
             progress = vehicleData.fuelLevel
         })
     end
-    
+
     if vehicleData.engineHealth then
         table.insert(metadata, {
             label = locale('engine'),
@@ -322,7 +360,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                         title = locale('send_vehicle_to_impound'),
                                         icon = 'warehouse',
                                         args = v.plate,
-                                        event = 'vrs_garage:sendVehicleConfiscated'
+                                        event = 'vrs_garage:sendVehicleImpound'
                                     })
 
                                     table.insert(options, {
@@ -388,7 +426,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                             title = locale('send_vehicle_to_impound'),
                                             icon = 'warehouse',
                                             args = v.plate,
-                                            event = 'vrs_garage:sendVehicleConfiscated'
+                                            event = 'vrs_garage:sendVehicleImpound'
                                         })
 
                                         table.insert(options, {

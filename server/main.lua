@@ -1,5 +1,5 @@
 ESX = exports['es_extended']:getSharedObject()
---
+lib.locale()
 lib.versionCheck('gabovrs/vrs_garage')
 
 lib.callback.register('vrs_garage:checkOwner', function(source, plate)
@@ -55,7 +55,8 @@ end)
 RegisterServerEvent('vrs_garage:buyVehicle', function(plate, vehicle, parking, job)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    CustomSQL('insert', 'INSERT INTO owned_vehicles (owner, plate, vehicle, type, stored, parking, impound, job) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    CustomSQL('insert',
+        'INSERT INTO owned_vehicles (owner, plate, vehicle, type, stored, parking, impound, job) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         {identifier, plate, json.encode(vehicle), 'car', 1, parking, 0, job})
 end)
 
@@ -116,4 +117,17 @@ function CustomSQL(type, action, placeholder)
         end
     end
     return result
+end
+
+
+if Config.ImpoundCommandEnabled then
+    ESX.RegisterCommand(Config.ImpoundCommand.command, 'user', function(xPlayer, args, showError)
+        for k, job in pairs(Config.ImpoundCommand.jobs) do
+            if xPlayer.getJob().name == job then
+                xPlayer.triggerEvent('vrs_garage:impoundVehicle')
+            end
+        end
+    end, false, {
+        help = locale('command_impound')
+    })    
 end

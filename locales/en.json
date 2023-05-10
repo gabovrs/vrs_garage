@@ -36,11 +36,15 @@
     "not_enought_money": "You don't have enough money.",
     "vehicle_out": "Vehicle is out of the garage.",
     "vehicle_stored": "Vehicle stored successfully.",
+    "vehicle_impounded": "Impounded vehicle.",
     "vehicle_sent_to_impounded": "Vehicle sent to impound.",
     "vehicle_found": "Vehicle marked on your GPS.",
     "vehicle_purchased": "Vehicle purchased.",
     "not_in_vehicle": "You are not in a vehicle.",
     "vehicle_not_found": "Vehicle not found.",
     "vehicle_not_allowed": "You can't store this vehicle here.",
-    "not_owner": "You don't own this vehicle."
+    "not_owner": "You don't own this vehicle.",
+    "no_vehicles_nearby": "No vehicles nearby.",
+    "impounding_progress": "Impounding vehicle...",
+    "impound_command" : "Vehicle impound"
 }

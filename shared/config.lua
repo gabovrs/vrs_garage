@@ -10,6 +10,16 @@ Config.JobVehicleShopEnabled = true -- enable the drawing of locations
 
 Config.Debug = false -- enable the drawing of locations
 
+Config.ImpoundCommandEnabled = true
+
+Config.ImpoundCommand = {
+    command = 'impound',
+    radius = 2.0,
+    jobs = { -- jobs with access to this command 
+        'police'
+    }
+}
+
 Config.FinePrice = 50
 
 Config.TransferVehiclePrice = 200
