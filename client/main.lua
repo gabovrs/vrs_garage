@@ -231,6 +231,27 @@ function GetVehicleName(model)
     return name
 end
 
+function GetVehicleMetaData(vehicleData)
+    local metadata = {}
+
+    if vehicleData.fuelLevel then
+        table.insert(metadata, {
+            label = locale('fuel'),
+            value = vehicleData.fuelLevel .. '%',
+            progress = vehicleData.fuelLevel
+        })
+    end
+    
+    if vehicleData.engineHealth then
+        table.insert(metadata, {
+            label = locale('engine'),
+            value = vehicleData.engineHealth / 10 .. '%',
+            progress = vehicleData.engineHealth / 10
+        })
+    end
+    return metadata
+end
+
 RegisterNetEvent('vrs_garage:access-garage', function(zone)
     lib.callback('vrs_garage:getVehicles', false, function(vehicles)
         local options = {}
@@ -243,16 +264,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                     local icon = 'car'
                     local description = locale('plate', v.plate)
                     local disabled = false
-
-                    local metadata = {{
-                        label = locale('fuel'),
-                        value = vehicleData.fuelLevel .. '%',
-                        progress = vehicleData.fuelLevel
-                    }, {
-                        label = locale('engine'),
-                        value = vehicleData.engineHealth / 10 .. '%',
-                        progress = vehicleData.engineHealth / 10
-                    }}
+                    local metadata = GetVehicleMetaData(vehicleData)
 
                     if v.stored == 0 then
                         iconColor = 'rgb(250 204 21)'
@@ -498,21 +510,14 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
                 local vehicleTitle = GetVehicleName(vehicleData.model)
                 local iconColor = 'rgb(190 18 60)'
                 local icon = 'car'
+                local metadata = GetVehicleMetaData(vehicleData)
 
                 table.insert(options, {
                     title = vehicleTitle,
                     icon = icon,
                     iconColor = iconColor,
                     description = locale('plate', v.plate),
-                    metadata = {{
-                        label = locale('fuel'),
-                        value = vehicleData.fuelLevel .. '%',
-                        progress = vehicleData.fuelLevel
-                    }, {
-                        label = locale('engine'),
-                        value = vehicleData.engineHealth / 10 .. '%',
-                        progress = vehicleData.engineHealth / 10
-                    }},
+                    metadata = metadata,
                     onSelect = function()
                         local options = {}
                         table.insert(options, {
@@ -765,4 +770,12 @@ for job, vehicles in pairs(Config.JobVehicles) do
             ExitPreviewMode()
         end
     })
+end
+
+if Config.Debug then
+    Citizen.CreateThread(function()
+        CreateGarages()
+        CreateImpounds()
+        CreateJobGarages()
+    end)
 end
