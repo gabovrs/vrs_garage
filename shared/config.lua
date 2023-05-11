@@ -2,6 +2,8 @@ Config = {}
 
 Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
 
+Config.FuelSystem = 'LegacyFuel' -- 'LegacyFuel', 'custom' (client/main.lua:70 to set a custom export)
+
 Config.PedEnabled = true
 
 Config.JobGarajesEnabled = true -- enable the drawing of locations

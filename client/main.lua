@@ -62,6 +62,13 @@ function spawnVehicle(vehicleData, plate, coords)
                 type = 'success'
             })
             TriggerServerEvent('vrs_garage:setVehicleOut', plate, false)
+            if Config.FuelSystem == 'LegacyFuel' then
+                if vehicleData.fuelLevel then
+                    exports["LegacyFuel"]:SetFuel(veh, vehicleData.fuelLevel)
+                end
+            elseif Config.FuelSystem == 'custom' then
+                -- add your custom system export here
+            end
         end)
     else
         lib.notify({
