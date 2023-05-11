@@ -4,7 +4,9 @@ lib.versionCheck('gabovrs/vrs_garage')
 
 lib.callback.register('vrs_garage:checkOwner', function(source, plate)
     local result = CustomSQL('query', 'SELECT owner FROM owned_vehicles WHERE plate = ?', {plate})
-    return result[1].owner or false
+    if #result > 0 then
+        return result[1].owner
+    end
 end)
 
 lib.callback.register('vrs_garage:getVehicles', function(source, job)
