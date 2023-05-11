@@ -15,7 +15,7 @@ Optimized garage system
 
 
 ## Dependencies
- - [ESX Legacy](https://github.com/esx-framework/esx_core/releases)
+ - [ESX (any version)](https://github.com/esx-framework/esx_core/releases)
  - [ox_lib](https://github.com/overextended/ox_lib/releases)
 
 
