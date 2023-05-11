@@ -21,19 +21,20 @@ Optimized garage system
 
 ## Features
 
-- System to prevent vehicle duplication
-- Possibility to buy vehicles for jobs
-- Special garage for jobs with whitelist and without whitelist
-- Functionality to transfer vehicles between garages with pricing
-- Custom naming of add-on vehicles
-- PED customization and animations in each location
-- [Roouting Bucket](https://cookbook.fivem.net/2020/11/27/routing-buckets-split-game-state/) to avoid vehicle congestion
-- Option to find lost vehicles
-- Live previews
-- Unique spaces in each garage
-- Saves engine damage
-- Save the fuel
-- Save body damage
+- Impound command for whitelisted jobs (`/impound`).
+- System to prevent vehicle duplication.
+- Possibility to buy vehicles for jobs.
+- Special garage for jobs with whitelist and without whitelist.
+- Functionality to transfer vehicles between garages with pricing.
+- Custom naming of add-on vehicles.
+- PED customization and animations available in each location.
+- [Routing Bucket](https://cookbook.fivem.net/2020/11/27/routing-buckets-split-game-state/) implementation to avoid vehicle congestion.
+- Option to find lost vehicles.
+- Live previews for vehicles.
+- Unique spaces provided in each garage.
+- Engine damage is saved.
+- Fuel level is saved.
+- Body damage is saved.
 
 
 ## Screenshots
