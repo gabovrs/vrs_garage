@@ -271,7 +271,7 @@ function GetVehicleName(model)
     local displayName = GetDisplayNameFromVehicleModel(model)
     local name = GetLabelText(displayName)
     if name == 'NULL' then
-        name = Config.VehiclesNames[string.lower(displayName)]
+        name = Config.VehiclesNames[string.lower(displayName)] or displayName
     end
     return name
 end
