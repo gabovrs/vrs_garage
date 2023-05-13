@@ -51,5 +51,5 @@
     "not_owner": "Este vehículo no te pertenece.",
     "no_vehicles_nearby": "No hay vehículos cerca.",
     "impounding_progress": "Incautautando de vehículos...",
-    "impound_command" : "Incautar vehículo"
+    "command_impound" : "Incautar vehículo"
 }
