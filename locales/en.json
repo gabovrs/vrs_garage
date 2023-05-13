@@ -1,4 +1,9 @@
 {
+    "radial-garage": "Garage",
+    "radial-access-store": "Store Vehicle",
+    "radial-access-garage": "View Vehicles",
+    "radial-access-garage-job": "Garage Menu",
+    "radial-access-impound": "Impounded Vehicles",
     "garage_blip": "Garage",
     "impound_blip": "Impounded Vehicles",
     "access-store": "[E] - Store Vehicle",

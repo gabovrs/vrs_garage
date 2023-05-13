@@ -1,4 +1,9 @@
 {
+    "radial-garage": "Garaje",
+    "radial-access-store": "Guardar vehículo",
+    "radial-access-garage": "Ver vehículos",
+    "radial-access-garage-job": "Menú del garaje",
+    "radial-access-impound": "Vehículos incautados",
     "garage_blip": "Garaje",
     "impound_blip": "Vehículos incautados",
     "access-store": "[E] - Guardar vehículo",

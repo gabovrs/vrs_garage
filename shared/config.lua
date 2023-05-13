@@ -1,8 +1,10 @@
 Config = {}
 
+Config.UseRadialMenu = false
+
 Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
 
-Config.FuelSystem = 'LegacyFuel' -- 'LegacyFuel', 'custom' (client/main.lua:70 to set a custom export)
+Config.FuelSystem = 'LegacyFuel' -- 'LegacyFuel', 'ox_fuel', 'custom' (client/main.lua:98 to set a custom export)
 
 Config.PedEnabled = true
 

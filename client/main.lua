@@ -21,15 +21,37 @@ end)
 function onEnter(self)
     zoneIndex = self.index
     if self.job then
-        if ESX.PlayerData.job.name == self.job then
+        if Config.UseRadialMenu then
+            lib.addRadialItem({{
+                id = 'access-'.. self.name,
+                label = locale('radial-access-'.. self.name),
+                icon = self.icon,
+                onSelect = function()
+                    TriggerEvent('vrs_garage:access-' .. self.name, self)
+                end
+            }})
+        else
+            if ESX.PlayerData.job.name == self.job then
+                lib.showTextUI(locale('access-' .. self.name), {
+                    icon = self.icon
+                })
+            end
+        end
+    else
+        if Config.UseRadialMenu then
+            lib.addRadialItem({{
+                id = 'access-'.. self.name,
+                label = locale('radial-access-'.. self.name),
+                icon = self.icon,
+                onSelect = function()
+                    TriggerEvent('vrs_garage:access-' .. self.name, self)
+                end
+            }})
+        else
             lib.showTextUI(locale('access-' .. self.name), {
                 icon = self.icon
             })
         end
-    else
-        lib.showTextUI(locale('access-' .. self.name), {
-            icon = self.icon
-        })
     end
 end
 
@@ -37,7 +59,11 @@ function onExit(self)
     if zoneIndex then
         zoneIndex = nil
     end
-    lib.hideTextUI()
+    if Config.UseRadialMenu then
+        lib.removeRadialItem('access-' ..self.name)
+    else
+        lib.hideTextUI()
+    end
 end
 
 function inside(self)
@@ -66,6 +92,8 @@ function spawnVehicle(vehicleData, plate, coords)
                 if vehicleData.fuelLevel then
                     exports["LegacyFuel"]:SetFuel(veh, vehicleData.fuelLevel)
                 end
+            elseif Config.FuelSystem == 'ox_fuel' then
+                Entity(veh).state.fuel = vehicleData.fuelLevel
             elseif Config.FuelSystem == 'custom' then
                 -- add your custom system export here
             end
@@ -96,7 +124,7 @@ RegisterNetEvent('vrs_garage:impoundVehicle', function()
                 anim = {
                     dict = 'mini@repair',
                     clip = 'fixing_a_ped'
-                },
+                }
             }) then
                 TriggerServerEvent('vrs_garage:setVehicleImpound', GetVehicleNumberPlateText(closestVehicle), true)
                 SetEntityAsMissionEntity(closestVehicle, true, true)
@@ -112,7 +140,7 @@ RegisterNetEvent('vrs_garage:impoundVehicle', function()
     else
         lib.notify({
             description = locale('no_vehicles_nearby'),
-            type = 'error',
+            type = 'error'
         })
     end
 end)
