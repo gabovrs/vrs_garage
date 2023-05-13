@@ -67,7 +67,7 @@ function onExit(self)
 end
 
 function inside(self)
-    if IsControlJustReleased(0, 38) then
+    if IsControlJustReleased(0, 38) and not Config.UseRadialMenu then
         if self.job then
             if ESX.PlayerData.job.name == self.job then
                 TriggerEvent('vrs_garage:access-' .. self.name, self)
