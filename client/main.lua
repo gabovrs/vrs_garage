@@ -22,14 +22,16 @@ function onEnter(self)
     zoneIndex = self.index
     if self.job then
         if Config.UseRadialMenu then
-            lib.addRadialItem({{
-                id = 'access-'.. self.name,
-                label = locale('radial-access-'.. self.name),
-                icon = self.icon,
-                onSelect = function()
-                    TriggerEvent('vrs_garage:access-' .. self.name, self)
-                end
-            }})
+            if ESX.PlayerData.job.name == self.job then
+                lib.addRadialItem({{
+                    id = 'access-'.. self.name,
+                    label = locale('radial-access-'.. self.name),
+                    icon = self.icon,
+                    onSelect = function()
+                        TriggerEvent('vrs_garage:access-' .. self.name, self)
+                    end
+                }})
+            end
         else
             if ESX.PlayerData.job.name == self.job then
                 lib.showTextUI(locale('access-' .. self.name), {
