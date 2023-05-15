@@ -258,7 +258,7 @@ RegisterNetEvent('vrs_garage:access-garage-job', function(zone)
 
     lib.registerContext({
         id = 'garage_job',
-        title = locale(zone.index),
+        title = zone.index,
         options = options
     })
 
@@ -500,7 +500,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
         end
         lib.registerContext({
             id = 'garage_vehicles',
-            title = locale(zone.index),
+            title = zone.index,
             options = options,
             onExit = function()
                 ExitPreviewMode()
@@ -624,7 +624,7 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
 
         lib.registerContext({
             id = 'garage_vehicles',
-            title = locale(zone.index),
+            title = zone.index,
             options = options
         })
 
