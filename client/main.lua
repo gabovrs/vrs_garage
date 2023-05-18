@@ -21,8 +21,8 @@ end)
 function onEnter(self)
     zoneIndex = self.index
     if self.job then
-        if Config.UseRadialMenu then
-            if ESX.PlayerData.job.name == self.job then
+        if ESX.PlayerData.job.name == self.job then
+            if Config.UseRadialMenu then
                 lib.addRadialItem({{
                     id = 'access-'.. self.name,
                     label = locale('radial-access-'.. self.name),
@@ -31,9 +31,7 @@ function onEnter(self)
                         TriggerEvent('vrs_garage:access-' .. self.name, self)
                     end
                 }})
-            end
-        else
-            if ESX.PlayerData.job.name == self.job then
+            else
                 lib.showTextUI(locale('access-' .. self.name), {
                     icon = self.icon
                 })
@@ -702,18 +700,19 @@ end
 function CreateGarages()
     for k, v in pairs(Config.Garages) do
         CreatePeds(v.ped, v.access)
-        local blip = AddBlipForCoord(v.store.x, v.store.y)
+        if v.blip then
+            local blip = AddBlipForCoord(v.store.x, v.store.y)
 
-        SetBlipSprite(blip, Config.GarageBlip.sprite)
-        SetBlipDisplay(blip, 4)
-        SetBlipScale(blip, Config.GarageBlip.scale)
-        SetBlipColour(blip, Config.GarageBlip.colour)
-        SetBlipAsShortRange(blip, true)
-
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentSubstringPlayerName(locale('garage_blip'))
-        EndTextCommandSetBlipName(blip)
-        -- TaskStartScenarioInPlace(ped, 'WORLD_HUMAN_CLIPBOARD', true, true)
+            SetBlipSprite(blip, Config.GarageBlip.sprite)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, Config.GarageBlip.scale)
+            SetBlipColour(blip, Config.GarageBlip.colour)
+            SetBlipAsShortRange(blip, true)
+    
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(locale('garage_blip'))
+            EndTextCommandSetBlipName(blip) 
+        end
 
         v.access_zone = lib.zones.sphere({
             index = k,
@@ -744,17 +743,19 @@ end
 function CreateImpounds()
     for k, v in pairs(Config.Impounds) do
         CreatePeds(v.ped, v.access)
-        local blip = AddBlipForCoord(v.access.x, v.access.y)
+        if v.blip then
+            local blip = AddBlipForCoord(v.access.x, v.access.y)
 
-        SetBlipSprite(blip, Config.ImpoundBlip.sprite)
-        SetBlipDisplay(blip, 4)
-        SetBlipScale(blip, Config.ImpoundBlip.scale)
-        SetBlipColour(blip, Config.ImpoundBlip.colour)
-        SetBlipAsShortRange(blip, true)
-
-        BeginTextCommandSetBlipName('STRING')
-        AddTextComponentSubstringPlayerName(locale('impound_blip'))
-        EndTextCommandSetBlipName(blip)
+            SetBlipSprite(blip, Config.ImpoundBlip.sprite)
+            SetBlipDisplay(blip, 4)
+            SetBlipScale(blip, Config.ImpoundBlip.scale)
+            SetBlipColour(blip, Config.ImpoundBlip.colour)
+            SetBlipAsShortRange(blip, true)
+    
+            BeginTextCommandSetBlipName('STRING')
+            AddTextComponentSubstringPlayerName(locale('impound_blip'))
+            EndTextCommandSetBlipName(blip) 
+        end
 
         v.access_zone = lib.zones.sphere({
             index = k,
