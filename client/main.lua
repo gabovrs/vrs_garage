@@ -714,6 +714,8 @@ function CreateGarages()
             EndTextCommandSetBlipName(blip) 
         end
 
+        RemoveVehiclesFromGeneratorsInArea(v.store.x - 20.0, v.store.y - 20.0, v.store.z - 20.0, v.store.x + 20.0, v.store.y + 20.0, v.store.z + 20.0)
+
         v.access_zone = lib.zones.sphere({
             index = k,
             name = 'garage',
