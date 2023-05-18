@@ -4,7 +4,7 @@ game 'gta5'
 
 description 'Simple Garage System'
 lua54 'yes'
-version 'v1.2.2'
+version 'v1.2.3'
 
 author 'VRS'
 

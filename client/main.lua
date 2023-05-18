@@ -759,7 +759,7 @@ function CreateImpounds()
             EndTextCommandSetBlipName(blip) 
         end
 
-        RemoveVehiclesFromGeneratorsInArea(v.store.x - 20.0, v.store.y - 20.0, v.store.z - 20.0, v.store.x + 20.0, v.store.y + 20.0, v.store.z + 20.0)
+        RemoveVehiclesFromGeneratorsInArea(v.access.x - 20.0, v.access.y - 20.0, v.access.z - 20.0, v.access.x + 20.0, v.access.y + 20.0, v.access.z + 20.0)
 
         v.access_zone = lib.zones.sphere({
             index = k,
@@ -780,7 +780,7 @@ function CreateJobGarages()
             for garage, w in pairs(v.locations) do
                 CreatePeds(v.ped, w.access)
 
-                RemoveVehiclesFromGeneratorsInArea(v.store.x - 20.0, v.store.y - 20.0, v.store.z - 20.0, v.store.x + 20.0, v.store.y + 20.0, v.store.z + 20.0)
+                RemoveVehiclesFromGeneratorsInArea(w.store.x - 20.0, w.store.y - 20.0, w.store.z - 20.0, w.store.x + 20.0, w.store.y + 20.0, w.store.z + 20.0)
 
                 w.access_zone = lib.zones.sphere({
                     index = garage,
