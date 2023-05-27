@@ -30,7 +30,7 @@
     "parked_in": "Parked in:",
     "impounded": "(Impounded)",
     "take_out_vehicle": "Take vehicle out of garage",
-    "transfer_vehicle": "Transferir vehículo a este garaje",
+    "transfer_vehicle": "Transfer vehicle to this garage ($%s)",
     "garage_shop": "Vehicle Shop",
     "stored_vehicles": "Stored Vehicles",
     "recover_vehicle": "Recover Vehicle ($%s)",

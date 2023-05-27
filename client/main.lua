@@ -8,9 +8,6 @@ local inPreviewMode = false
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
     ESX.PlayerData = xPlayer
-    CreateGarages()
-    CreateImpounds()
-    CreateJobGarages()
 end)
 
 RegisterNetEvent('esx:setJob')
@@ -97,6 +94,10 @@ function spawnVehicle(vehicleData, plate, coords)
             elseif Config.FuelSystem == 'custom' then
                 -- add your custom system export here
             end
+            if Config.KeySystem == 'custom' then
+                -- add your custom system export here
+                -- DecorSetInt(veh, "owner", GetPlayerServerId(PlayerId()))
+            end
         end)
     else
         lib.notify({
@@ -151,7 +152,7 @@ RegisterNetEvent('vrs_garage:takeOutVehicle', function(args)
     ExitPreviewMode()
     lib.callback('vrs_garage:getVehicle', false, function(vehicle)
         if vehicle then
-            if vehicle.stored == 1 then
+            if vehicle.stored then
                 local vehicleData = json.decode(vehicle.vehicle)
                 spawnVehicle(vehicleData, vehicle.plate, args.spawn)
             else
@@ -240,15 +241,14 @@ RegisterNetEvent('vrs_garage:access-garage-job', function(zone)
         table.insert(options, {
             title = locale('garage_shop'),
             icon = 'shop',
-            onSelect = function()
-                lib.showContext('garage_shop_' .. zone.job)
-            end
+            menu = 'garage_shop_' ..zone.job
         })
     end
 
     table.insert(options, {
         title = locale('stored_vehicles'),
         icon = 'warehouse',
+        arrow = true,
         onSelect = function()
             TriggerEvent('vrs_garage:access-garage', zone)
         end
@@ -336,20 +336,18 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                     local iconColor = 'rgb(29 78 216)'
                     local icon = 'car'
                     local description = locale('plate', v.plate)
-                    local disabled = false
                     local metadata = GetVehicleMetaData(vehicleData)
 
-                    if v.stored == 0 then
-                        iconColor = 'rgb(250 204 21)'
+                    if v.stored == 0 or v.stored == false then
+                        iconColor = 'rgb(250 204 21)' --Yellow
                     end
 
-                    if v.impound == 1 then
-                        iconColor = 'rgb(190 18 60)'
-                        disabled = true
+                    if v.impound == 1 or v.impound == true then
+                        iconColor = 'rgb(190 18 60)' --Red
                         vehicleTitle = vehicleTitle .. ' ' .. locale('impounded')
                     end
 
-                    if v.parking ~= nil and v.parking ~= zone.index and v.stored == 1 then
+                    if v.parking ~= nil and v.parking ~= zone.index and (v.stored == 1 or v.stored == true) then
                         iconColor = 'rgb(96 165 250)'
                         description = description .. ', ' .. locale('parked_in') .. ' ' .. locale(v.parking)
                     end
@@ -359,15 +357,17 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                             title = vehicleTitle .. ' ' .. locale('job'),
                             icon = icon,
                             iconColor = iconColor,
-                            disabled = disabled,
+                            disabled = v.impound == 1 or v.impound == true,
                             description = description,
                             metadata = metadata,
+                            arrow = true,
                             onSelect = function()
                                 local options = {}
-                                if v.stored == 1 then
-                                    if v.parking ~= nil and v.parking ~= zone.index and v.stored == 1 then
+                                if v.stored == 1 or v.stored == true then
+                                    if v.parking ~= nil and v.parking ~= zone.index then
                                         table.insert(options, {
                                             title = locale('transfer_vehicle'),
+                                            description = '',
                                             icon = 'right-from-bracket',
                                             args = {
                                                 plate = v.plate,
@@ -412,11 +412,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                     title = vehicleTitle,
                                     options = options,
                                     canClose = false
-                                    -- onExit = function()
-                                    --     ExitPreviewMode()
-                                    -- end
                                 })
-
                                 lib.showContext('garage_vehicle_options')
                             end
                         })
@@ -426,13 +422,14 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                 title = vehicleTitle,
                                 icon = icon,
                                 iconColor = iconColor,
-                                disabled = disabled,
+                                disabled = v.impound == 1 or v.impound == true,
                                 description = description,
                                 metadata = metadata,
+                                arrow = true,
                                 onSelect = function()
                                     local options = {}
-                                    if v.stored == 1 then
-                                        if v.parking ~= nil and v.parking ~= zone.index and v.stored == 1 then
+                                    if v.stored == 1 or v.stored == true then
+                                        if v.parking ~= nil and v.parking ~= zone.index then
                                             table.insert(options, {
                                                 title = locale('transfer_vehicle', Config.TransferVehiclePrice),
                                                 icon = 'right-from-bracket',
@@ -477,11 +474,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                         title = vehicleTitle,
                                         options = options,
                                         canClose = false
-                                        -- onExit = function()
-                                        --     ExitPreviewMode()
-                                        -- end
                                     })
-
                                     lib.showContext('garage_vehicle_options')
                                 end
                             })
@@ -528,7 +521,7 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
                                 type = 'success'
                             })
                             SetEntityAsMissionEntity(currentVehicle, true, true)
-                            NetworkFadeOutEntity(currentVehicle, true, true)
+                            -- NetworkFadeOutEntity(currentVehicle, true, true)
                             Wait(1000)
                             DeleteVehicle(currentVehicle)
                         else
@@ -591,6 +584,7 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
                     iconColor = iconColor,
                     description = locale('plate', v.plate),
                     metadata = metadata,
+                    arrow = true,
                     onSelect = function()
                         local options = {}
                         table.insert(options, {
@@ -607,7 +601,6 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
                             title = vehicleTitle,
                             options = options
                         })
-
                         lib.showContext('garage_vehicle_options')
                     end
                 })
@@ -633,7 +626,7 @@ end)
 RegisterNetEvent('vrs_garage:recoverVehicle', function(args)
     lib.callback('vrs_garage:getVehicle', false, function(vehicle)
         if vehicle then
-            if vehicle.impound == 1 then
+            if vehicle.impound then
                 lib.callback('vrs_garage:canPay', false, function(canPay)
                     if canPay then
                         local vehicleData = json.decode(vehicle.vehicle)
@@ -716,26 +709,24 @@ function CreateGarages()
 
         RemoveVehiclesFromGeneratorsInArea(v.store.x - 20.0, v.store.y - 20.0, v.store.z - 20.0, v.store.x + 20.0, v.store.y + 20.0, v.store.z + 20.0)
 
-        v.access_zone = lib.zones.sphere({
+        lib.points.new({
             index = k,
             name = 'garage',
             icon = 'warehouse',
             coords = v.access,
-            radius = 3,
-            debug = Config.Debug,
-            inside = inside,
+            distance = Config.AccessDistance,
+            nearby = inside,
             onEnter = onEnter,
             onExit = onExit
         })
 
-        v.store_zone = lib.zones.sphere({
+        lib.points.new({
             index = k,
             name = 'store',
             icon = 'square-parking',
             coords = v.store,
-            radius = 10,
-            debug = Config.Debug,
-            inside = inside,
+            distance = Config.StoreDistance,
+            nearby = inside,
             onEnter = onEnter,
             onExit = onExit
         })
@@ -761,13 +752,12 @@ function CreateImpounds()
 
         RemoveVehiclesFromGeneratorsInArea(v.access.x - 20.0, v.access.y - 20.0, v.access.z - 20.0, v.access.x + 20.0, v.access.y + 20.0, v.access.z + 20.0)
 
-        v.access_zone = lib.zones.sphere({
+        lib.points.new({
             index = k,
             name = 'impound',
             coords = v.access,
-            radius = 3,
-            debug = Config.Debug,
-            inside = inside,
+            distance = Config.AccessDistance,
+            nearby = inside,
             onEnter = onEnter,
             onExit = onExit
         })
@@ -782,28 +772,26 @@ function CreateJobGarages()
 
                 RemoveVehiclesFromGeneratorsInArea(w.store.x - 20.0, w.store.y - 20.0, w.store.z - 20.0, w.store.x + 20.0, w.store.y + 20.0, w.store.z + 20.0)
 
-                w.access_zone = lib.zones.sphere({
+                lib.points.new({
                     index = garage,
                     name = 'garage-job',
                     job = job,
                     icon = 'warehouse',
                     coords = w.access,
-                    radius = 3,
-                    debug = Config.Debug,
-                    inside = inside,
+                    distance = Config.AccessDistance,
+                    nearby = inside,
                     onEnter = onEnter,
                     onExit = onExit
                 })
 
-                v.store_zone = lib.zones.sphere({
+                lib.points.new({
                     index = garage,
                     name = 'store',
                     job = job,
                     icon = 'square-parking',
                     coords = w.store,
-                    radius = 10,
-                    debug = Config.Debug,
-                    inside = inside,
+                    distance = Config.StoreDistance,
+                    nearby = inside,
                     onEnter = onEnter,
                     onExit = onExit
                 })
@@ -819,6 +807,7 @@ for job, vehicles in pairs(Config.JobVehicles) do
         table.insert(options, {
             title = GetLabelText(GetDisplayNameFromVehicleModel(name)) .. ' ' .. '$' .. info.price,
             icon = 'car',
+            arrow = true,
             onSelect = function()
                 local vehicle = {
                     model = name
@@ -854,10 +843,11 @@ for job, vehicles in pairs(Config.JobVehicles) do
     })
 end
 
-if Config.Debug then
-    Citizen.CreateThread(function()
-        CreateGarages()
-        CreateImpounds()
-        CreateJobGarages()
-    end)
-end
+Citizen.CreateThread(function()
+    while not ESX.IsPlayerLoaded() do
+        Wait(100)
+    end
+    CreateGarages()
+    CreateImpounds()
+    CreateJobGarages()
+end)

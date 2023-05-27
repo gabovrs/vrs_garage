@@ -2,17 +2,21 @@ Config = {}
 
 Config.UseRadialMenu = false
 
+Config.AccessDistance = 3.0
+
+Config.StoreDistance = 10.0
+
 Config.MySQL = 'oxmysql' -- 'mysql-async', 'oxmysql', 'ghmattisql'
 
-Config.FuelSystem = 'LegacyFuel' -- 'LegacyFuel', 'ox_fuel', 'custom' (client/main.lua:98 to set a custom export)
+Config.FuelSystem = 'ox_fuel' -- 'LegacyFuel', 'ox_fuel', 'custom' (client/main.lua:98 to set a custom export)
+
+Config.KeySystem = 'custom'
 
 Config.PedEnabled = true
 
-Config.JobGarajesEnabled = true -- enable the drawing of locations
+Config.JobGarajesEnabled = true
 
-Config.JobVehicleShopEnabled = true -- enable the drawing of locations
-
-Config.Debug = false -- enable the drawing of locations
+Config.JobVehicleShopEnabled = true
 
 Config.ImpoundCommandEnabled = true
 
@@ -34,29 +38,33 @@ Config.DefaultPed = {
 }
 
 Config.GarageBlip = {
-    sprite = 50,
+    sprite = 357,
     scale = 0.8,
-    colour = 0
+    colour = 18
 }
 
 Config.ImpoundBlip = {
-    sprite = 524,
+    sprite = 317,
     scale = 0.8,
-    colour = 81
+    colour = 6
 }
 
 Config.VehiclesNames = {
-    ['evo9'] = 'Mitsubishi evo 9'
+    -- ['model'] = 'Vehicle Name',
 }
 
 Config.JobVehicles = {
     ['police'] = {
-        ['police2'] = {price = 5000},
-        ['police3'] = {price = 10000},
+        ['police'] = {price = 1000},
+        ['police2'] = {price = 1000},
+        ['police3'] = {price = 1000},
     },
     ['ambulance'] = {
-        ['ambulance'] = {price = 10000},
+        ['ambulance'] = {price = 1000},
     },
+    ['miner'] = {
+        ['sadler'] = {price = 1000000},
+    }
 }
 
 Config.JobGarajes = {
@@ -83,6 +91,19 @@ Config.JobGarajes = {
                 access = vec4(353.1519, -603.6036, 28.7761, 267.1620),
                 store = vec4(365.2415, -591.6791, 28.6921, 343.2072),
                 spawn = vec4(380.5848, -585.6525, 28.6481, 201.6172)
+            }
+        }
+    },
+    ['miner'] = {
+        ped = {
+            model = 's_m_m_dockwork_01',
+            task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT'
+        },
+        locations = {
+            ['orchardville_miner'] = {
+                access = vec4(870.4711, -2366.2339, 30.3462, 356.0012),
+                store = vec4(880.8738, -2350.4807, 30.3312, 87.9480),
+                spawn = vec4(843.8577, -2346.4854, 30.3346, 265.2579)
             }
         }
     }
