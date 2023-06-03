@@ -220,7 +220,7 @@ end)
 RegisterNetEvent('vrs_garage:transferVehicle', function(args)
     lib.callback('vrs_garage:canPay', false, function(canPay)
         if canPay then
-            TriggerServerEvent('vrs_garage:setVehicleParking', args.plate, args.parking)
+            TriggerServerEvent('vrs_garage:setVehicleParking', args.plate, args.zone.parking)
             lib.notify({
                 description = locale('vehicle_moved'),
                 type = 'success'
@@ -231,7 +231,7 @@ RegisterNetEvent('vrs_garage:transferVehicle', function(args)
                 type = 'error'
             })
         end
-    end, Config.TransferVehiclePrice)
+    end, Config.TransferVehiclePrice[args.zone.type])
 end)
 
 RegisterNetEvent('vrs_garage:access-garage-job', function(zone)
@@ -371,7 +371,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                             icon = 'right-from-bracket',
                                             args = {
                                                 plate = v.plate,
-                                                parking = zone.index
+                                                zone = zone
                                             },
                                             event = 'vrs_garage:transferVehicle'
                                         })
@@ -431,11 +431,11 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
                                     if v.stored == 1 or v.stored == true then
                                         if v.parking ~= nil and v.parking ~= zone.index then
                                             table.insert(options, {
-                                                title = locale('transfer_vehicle', Config.TransferVehiclePrice),
+                                                title = locale('transfer_vehicle', Config.TransferVehiclePrice[zone.type]),
                                                 icon = 'right-from-bracket',
                                                 args = {
                                                     plate = v.plate,
-                                                    parking = zone.index
+                                                    zone = zone
                                                 },
                                                 event = 'vrs_garage:transferVehicle'
                                             })
@@ -499,7 +499,7 @@ RegisterNetEvent('vrs_garage:access-garage', function(zone)
         })
 
         lib.showContext('garage_vehicles')
-    end, zone.job)
+    end, zone.job, zone.type)
 end)
 
 RegisterNetEvent('vrs_garage:access-store', function(zone)
@@ -511,7 +511,7 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
             if isOwner then
                 lib.callback('vrs_garage:getVehicle', false, function(vehicle)
                     if zone.job then
-                        if zone.job == vehicle.job then
+                        if zone.job == vehicle.job and zone.type == vehicle.type then
                             local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
                             TaskLeaveVehicle(ped, currentVehicle, 0)
                             Wait(2000)
@@ -531,7 +531,7 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
                             })
                         end
                     else
-                        if not vehicle.job then
+                        if not vehicle.job and zone.type == vehicle.type then
                             local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
                             TaskLeaveVehicle(ped, currentVehicle, 0)
                             Wait(2000)
@@ -588,7 +588,7 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
                     onSelect = function()
                         local options = {}
                         table.insert(options, {
-                            title = locale('recover_vehicle', Config.FinePrice),
+                            title = locale('recover_vehicle', Config.ImpoundFine[zone.type]),
                             icon = 'file-invoice',
                             args = {
                                 plate = v.plate,
@@ -620,7 +620,7 @@ RegisterNetEvent('vrs_garage:access-impound', function(zone)
         })
 
         lib.showContext('garage_vehicles')
-    end)
+    end, zone.type)
 end)
 
 RegisterNetEvent('vrs_garage:recoverVehicle', function(args)
@@ -638,7 +638,7 @@ RegisterNetEvent('vrs_garage:recoverVehicle', function(args)
                             type = 'error'
                         })
                     end
-                end, Config.FinePrice)
+                end, Config.ImpoundFine[args.zone.type])
             else
                 lib.notify({
                     description = locale('vehicle_not_impound'),
@@ -669,10 +669,10 @@ RegisterNetEvent('vrs_garage:buyVehicle', function(args)
     end, args.price)
 end)
 
-function CreatePeds(ped, location)
+function CreatePeds(ped, location, type)
     if Config.PedEnabled then
-        local pedModel = Config.DefaultPed.model
-        local pedTask = Config.DefaultPed.task
+        local pedModel = Config.DefaultPed[type].model
+        local pedTask = Config.DefaultPed[type].task
         if ped then
             pedModel = ped.model
             if ped.task then
@@ -692,14 +692,14 @@ end
 
 function CreateGarages()
     for k, v in pairs(Config.Garages) do
-        CreatePeds(v.ped, v.access)
+        CreatePeds(v.ped, v.access, v.type)
         if v.blip then
             local blip = AddBlipForCoord(v.store.x, v.store.y)
 
-            SetBlipSprite(blip, Config.GarageBlip.sprite)
+            SetBlipSprite(blip, Config.GarageBlip[v.type].sprite)
             SetBlipDisplay(blip, 4)
-            SetBlipScale(blip, Config.GarageBlip.scale)
-            SetBlipColour(blip, Config.GarageBlip.colour)
+            SetBlipScale(blip, Config.GarageBlip[v.type].scale)
+            SetBlipColour(blip, Config.GarageBlip[v.type].colour)
             SetBlipAsShortRange(blip, true)
     
             BeginTextCommandSetBlipName('STRING')
@@ -711,6 +711,7 @@ function CreateGarages()
 
         lib.points.new({
             index = k,
+            type = v.type,
             name = 'garage',
             icon = 'warehouse',
             coords = v.access,
@@ -722,6 +723,7 @@ function CreateGarages()
 
         lib.points.new({
             index = k,
+            type = v.type,
             name = 'store',
             icon = 'square-parking',
             coords = v.store,
@@ -735,7 +737,7 @@ end
 
 function CreateImpounds()
     for k, v in pairs(Config.Impounds) do
-        CreatePeds(v.ped, v.access)
+        CreatePeds(v.ped, v.access, v.type)
         if v.blip then
             local blip = AddBlipForCoord(v.access.x, v.access.y)
 
@@ -754,7 +756,9 @@ function CreateImpounds()
 
         lib.points.new({
             index = k,
+            type = v.type,
             name = 'impound',
+            icon = 'building-shield',
             coords = v.access,
             distance = Config.AccessDistance,
             nearby = inside,
@@ -768,12 +772,13 @@ function CreateJobGarages()
     if Config.JobGarajesEnabled then
         for job, v in pairs(Config.JobGarajes) do
             for garage, w in pairs(v.locations) do
-                CreatePeds(v.ped, w.access)
+                CreatePeds(v.ped, w.access, w.type)
 
                 RemoveVehiclesFromGeneratorsInArea(w.store.x - 20.0, w.store.y - 20.0, w.store.z - 20.0, w.store.x + 20.0, w.store.y + 20.0, w.store.z + 20.0)
 
                 lib.points.new({
                     index = garage,
+                    type = w.type,
                     name = 'garage-job',
                     job = job,
                     icon = 'warehouse',
@@ -786,6 +791,7 @@ function CreateJobGarages()
 
                 lib.points.new({
                     index = garage,
+                    type = w.type,
                     name = 'store',
                     job = job,
                     icon = 'square-parking',

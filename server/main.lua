@@ -9,23 +9,23 @@ lib.callback.register('vrs_garage:checkOwner', function(source, plate)
     end
 end)
 
-lib.callback.register('vrs_garage:getVehicles', function(source, job)
+lib.callback.register('vrs_garage:getVehicles', function(source, job, type)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     local result
     if job then
-        result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? and job = ? ORDER BY stored DESC',
-            {identifier, job})
+        result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? and job = ? and type = ? ORDER BY stored DESC',
+            {identifier, job, type})
     else
-        result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? ORDER BY stored DESC', {identifier})
+        result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? and type = ? ORDER BY stored DESC', {identifier, type})
     end
     return result
 end)
 
-lib.callback.register('vrs_garage:getImpoundedVehicles', function(source)
+lib.callback.register('vrs_garage:getImpoundedVehicles', function(source, type)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? and impound = 1', {identifier})
+    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE owner = ? and impound = 1 and type = ?', {identifier, type})
     return result
 end)
 
