@@ -670,30 +670,32 @@ RegisterNetEvent('vrs_garage:buyVehicle', function(args)
     end, args.price)
 end)
 
-function CreatePeds(ped, location, type)
-    if Config.PedEnabled then
-        local pedModel = Config.DefaultPed[type].model
-        local pedTask = Config.DefaultPed[type].task
-        if ped then
-            pedModel = ped.model
-            if ped.task then
-                pedTask = ped.task
-            end
-        end
-        lib.requestModel(pedModel)
+function CreatePeds(pedConfig, location, type)
 
-        local ped = CreatePed(0, GetHashKey(pedModel), vector3(location.x, location.y, location.z - 1.0), location.w,
-            false, false)
-        FreezeEntityPosition(ped, true)
-        SetEntityInvincible(ped, true)
-        SetBlockingOfNonTemporaryEvents(ped, true)
-        TaskStartScenarioInPlace(ped, pedTask, true, true)
+    local pedConfigModel = Config.DefaultPed[type].model
+    local pedConfigTask = Config.DefaultPed[type].task
+    if pedConfig then
+        pedConfigModel = pedConfig.model
+        if pedConfig.task then
+            pedTask = pedConfig.task
+        end
     end
+    lib.requestModel(pedConfigModel)
+
+    local ped = CreatePed(0, GetHashKey(pedConfigModel), vector3(location.x, location.y, location.z - 1.0), location.w,
+        false, false)
+    FreezeEntityPosition(ped, true)
+    SetEntityInvincible(ped, true)
+    SetBlockingOfNonTemporaryEvents(ped, true)
+    TaskStartScenarioInPlace(ped, pedTask, true, true)
+    
 end
 
 function CreateGarages()
     for k, v in pairs(Config.Garages) do
-        CreatePeds(v.ped, v.access, v.type)
+        if v.pedEnable then
+            CreatePeds(v.pedConfig, v.access, v.type)
+        end
         if v.blip then
             local blip = AddBlipForCoord(v.store.x, v.store.y)
 
@@ -708,6 +710,7 @@ function CreateGarages()
             EndTextCommandSetBlipName(blip) 
         end
 
+
         RemoveVehiclesFromGeneratorsInArea(v.store.x - 20.0, v.store.y - 20.0, v.store.z - 20.0, v.store.x + 20.0, v.store.y + 20.0, v.store.z + 20.0)
 
         lib.points.new({
@@ -716,7 +719,8 @@ function CreateGarages()
             name = 'garage',
             icon = 'warehouse',
             coords = v.access,
-            distance = Config.AccessDistance,
+            print(v.AccessDistance),
+            distance = v.AccessDistance,
             nearby = inside,
             onEnter = onEnter,
             onExit = onExit
@@ -728,7 +732,7 @@ function CreateGarages()
             name = 'store',
             icon = 'square-parking',
             coords = v.store,
-            distance = Config.StoreDistance,
+            distance = v.StoreDistance,
             nearby = inside,
             onEnter = onEnter,
             onExit = onExit
@@ -738,7 +742,9 @@ end
 
 function CreateImpounds()
     for k, v in pairs(Config.Impounds) do
-        CreatePeds(v.ped, v.access, v.type)
+        if v.pedEnable then
+            CreatePeds(v.pedConfig, v.access, v.type)
+        end
         if v.blip then
             local blip = AddBlipForCoord(v.access.x, v.access.y)
 
@@ -761,7 +767,7 @@ function CreateImpounds()
             name = 'impound',
             icon = 'building-shield',
             coords = v.access,
-            distance = Config.AccessDistance,
+            distance = v.AccessDistance,
             nearby = inside,
             onEnter = onEnter,
             onExit = onExit
@@ -773,8 +779,10 @@ function CreateJobGarages()
     if Config.JobGarajesEnabled then
         for job, v in pairs(Config.JobGarajes) do
             for garage, w in pairs(v.locations) do
-                CreatePeds(v.ped, w.access, w.type)
-
+                if w.pedEnable then
+                    CreatePeds(v.ped, w.access, w.type)
+                end
+                    
                 RemoveVehiclesFromGeneratorsInArea(w.store.x - 20.0, w.store.y - 20.0, w.store.z - 20.0, w.store.x + 20.0, w.store.y + 20.0, w.store.z + 20.0)
 
                 lib.points.new({
@@ -784,7 +792,7 @@ function CreateJobGarages()
                     job = job,
                     icon = 'warehouse',
                     coords = w.access,
-                    distance = Config.AccessDistance,
+                    distance = w.AccessDistance,
                     nearby = inside,
                     onEnter = onEnter,
                     onExit = onExit
@@ -797,7 +805,7 @@ function CreateJobGarages()
                     job = job,
                     icon = 'square-parking',
                     coords = w.store,
-                    distance = Config.StoreDistance,
+                    distance = w.StoreDistance,
                     nearby = inside,
                     onEnter = onEnter,
                     onExit = onExit
