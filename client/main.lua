@@ -127,7 +127,7 @@ RegisterNetEvent('vrs_garage:impoundVehicle', function()
                     clip = 'fixing_a_ped'
                 }
             }) then
-                TriggerServerEvent('vrs_garage:setVehicleImpound', GetVehicleNumberPlateText(closestVehicle), true)
+                TriggerServerEvent('vrs_garage:setVehicleImpound', string.gsub(GetVehicleNumberPlateText(closestVehicle), "%s", ""), true)
                 SetEntityAsMissionEntity(closestVehicle, true, true)
                 NetworkFadeOutEntity(closestVehicle, true, true)
                 Wait(1000)
@@ -507,6 +507,7 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
     if IsPedInAnyVehicle(ped, false) then
         local currentVehicle = GetVehiclePedIsIn(ped, false)
         local plate = GetVehicleNumberPlateText(currentVehicle)
+        plate = string.gsub(plate, "%s", "")
         lib.callback('vrs_garage:checkOwner', false, function(isOwner)
             if isOwner then
                 lib.callback('vrs_garage:getVehicle', false, function(vehicle)
