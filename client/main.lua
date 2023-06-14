@@ -4,6 +4,7 @@ local cam = nil
 local zoneIndex = nil
 local previewVehicle = nil
 local inPreviewMode = false
+local jobBlips = {}
 
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
@@ -13,6 +14,7 @@ end)
 RegisterNetEvent('esx:setJob')
 AddEventHandler('esx:setJob', function(job)
     ESX.PlayerData.job = job
+    ManageJobsBlips()
 end)
 
 function onEnter(self)
@@ -670,6 +672,33 @@ RegisterNetEvent('vrs_garage:buyVehicle', function(args)
     end, args.price)
 end)
 
+function ManageJobsBlips()
+    for k, v in pairs(jobBlips) do
+        RemoveBlip(v)
+        table.remove(jobBlips, k)
+    end
+    for job, v in pairs(Config.JobGarajes) do
+        if job == ESX.PlayerData.job.name then
+            for k, v in pairs(v.locations) do 
+                if v.blip then
+                    local blip = AddBlipForCoord(v.access.x, v.access.y)
+            
+                    SetBlipSprite(blip, v.blip.sprite)
+                    SetBlipDisplay(blip, 4)
+                    SetBlipScale(blip, v.blip.scale)
+                    SetBlipColour(blip, v.blip.colour)
+                    SetBlipAsShortRange(blip, true)
+            
+                    BeginTextCommandSetBlipName('STRING')
+                    AddTextComponentSubstringPlayerName(v.blip.label)
+                    EndTextCommandSetBlipName(blip) 
+                    table.insert(jobBlips, blip)
+                end
+            end
+        end
+    end
+end
+
 function CreatePeds(ped, location, type)
     if Config.PedEnabled then
         local pedModel = Config.DefaultPed[type].model
@@ -704,7 +733,7 @@ function CreateGarages()
             SetBlipAsShortRange(blip, true)
     
             BeginTextCommandSetBlipName('STRING')
-            AddTextComponentSubstringPlayerName(locale('garage_blip'))
+            AddTextComponentSubstringPlayerName(locale(v.type..'_garage_blip'))
             EndTextCommandSetBlipName(blip) 
         end
 
@@ -774,7 +803,6 @@ function CreateJobGarages()
         for job, v in pairs(Config.JobGarajes) do
             for garage, w in pairs(v.locations) do
                 CreatePeds(v.ped, w.access, w.type)
-
                 RemoveVehiclesFromGeneratorsInArea(w.store.x - 20.0, w.store.y - 20.0, w.store.z - 20.0, w.store.x + 20.0, w.store.y + 20.0, w.store.z + 20.0)
 
                 lib.points.new({
@@ -857,4 +885,5 @@ Citizen.CreateThread(function()
     CreateGarages()
     CreateImpounds()
     CreateJobGarages()
+    ManageJobsBlips()
 end)

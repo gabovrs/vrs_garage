@@ -1,3 +1,5 @@
+lib.locale()
+
 Config = {}
 
 Config.UseRadialMenu = false
@@ -105,6 +107,12 @@ Config.JobGarajes = {
         },
         locations = {
             ['vespucci_police'] = {
+                blip = { -- only visible to those who have the job
+                    label = locale('police_garage_blip'),
+                    sprite = 357,
+                    scale = 0.8,
+                    colour = 29
+                },
                 access = vec4(440.3128, -1013.3806, 28.6250, 152.6308),
                 store = vec4(423.4687, -1021.6505, 28.9481, 88.9128),
                 spawn = vec4(450.7397, -1019.5090, 28.4583, 92.3000),
@@ -119,6 +127,12 @@ Config.JobGarajes = {
         },
         locations = {
             ['strawberry_ambulance'] = {
+                blip = {
+                    label = locale('ambulance_garage_blip'),
+                    sprite = 357,
+                    scale = 0.8,
+                    colour = 1
+                },
                 access = vec4(353.1519, -603.6036, 28.7761, 267.1620),
                 store = vec4(365.2415, -591.6791, 28.6921, 343.2072),
                 spawn = vec4(380.5848, -585.6525, 28.6481, 201.6172),
