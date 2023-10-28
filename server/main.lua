@@ -3,7 +3,7 @@ lib.locale()
 lib.versionCheck('gabovrs/vrs_garage')
 
 lib.callback.register('vrs_garage:checkOwner', function(source, plate)
-    local result = CustomSQL('query', 'SELECT owner FROM owned_vehicles WHERE plate = ?', {plate})
+    local result = CustomSQL('query', 'SELECT owner FROM owned_vehicles WHERE REPLACE(plate, " ", "") = ?', {plate})
     if #result > 0 then
         return result[1].owner
     end
@@ -41,16 +41,17 @@ lib.callback.register('vrs_garage:canPay', function(source, amount)
 end)
 
 lib.callback.register('vrs_garage:getVehicle', function(source, plate)
+    local plate = string.gsub(plate, ' ', '')
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE plate = ? and owner = ?', {plate, identifier})
+    local result = CustomSQL('query', 'SELECT * FROM owned_vehicles WHERE REPLACE(plate, " ", "") = ? and owner = ?', {plate, identifier})
     return result[1]
 end)
 
 RegisterServerEvent('vrs_garage:updateVehicle', function(plate, vehicle, parking, stored)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
-    CustomSQL('update', 'UPDATE owned_vehicles SET vehicle = ?, parking = ?, stored = ? WHERE plate = ? and owner = ?',
+    CustomSQL('update', 'UPDATE owned_vehicles SET vehicle = ?, parking = ?, stored = ? WHERE REPLACE(plate, " ", "") = ? and owner = ?',
         {vehicle, parking, stored, plate, identifier})
 end)
 
@@ -66,7 +67,7 @@ RegisterServerEvent('vrs_garage:setVehicleOut', function(plate, stored)
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     CustomSQL('update',
-        'UPDATE owned_vehicles SET stored = ?, parking = NULL, impound = NULL WHERE plate = ? and owner = ?',
+        'UPDATE owned_vehicles SET stored = ?, parking = NULL, impound = NULL WHERE REPLACE(plate, " ", "") = ? and owner = ?',
         {stored, plate, identifier})
 end)
 
@@ -84,11 +85,12 @@ RegisterServerEvent('vrs_garage:setVehicleImpound', function(plate, impound)
         {impound, plate, identifier})
 end)
 
-RegisterServerEvent('vrs_garage:setPlayerRoutingBucket', function(bucket)
+lib.callback.register('vrs_garage:setPlayerRoutingBucket', function(source, bucket)
     if not bucket then
         bucket = math.random(1000)
     end
     SetPlayerRoutingBucket(source, bucket)
+    return true
 end)
 
 function CustomSQL(type, action, placeholder)
