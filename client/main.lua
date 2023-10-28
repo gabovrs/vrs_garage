@@ -1,5 +1,6 @@
 ESX = exports['es_extended']:getSharedObject()
 lib.locale()
+local isBusy = false
 local cam = nil
 local zoneIndex = nil
 local previewVehicle = nil
@@ -66,7 +67,8 @@ function onExit(self)
 end
 
 function inside(self)
-    if IsControlJustReleased(0, 38) and not Config.UseRadialMenu then
+    if IsControlJustReleased(0, 38) and not Config.UseRadialMenu and not isBusy then
+        isBusy = true
         if self.job then
             if ESX.PlayerData.job.name == self.job then
                 TriggerEvent('vrs_garage:access-' .. self.name, self)
@@ -74,6 +76,8 @@ function inside(self)
         else
             TriggerEvent('vrs_garage:access-' .. self.name, self)
         end
+        Citizen.Wait(1000)
+        isBusy = false
     end
 end
 
@@ -97,8 +101,8 @@ function spawnVehicle(vehicleData, plate, coords)
                 -- add your custom system export here
             end
             if Config.KeySystem == 'custom' then
+                Entity(veh).state.owner = GetPlayerServerId(PlayerId())
                 -- add your custom system export here
-                -- DecorSetInt(veh, "owner", GetPlayerServerId(PlayerId()))
             end
         end)
     else
@@ -267,21 +271,23 @@ end)
 
 function EnterPreviewMode(vehicleData, spawn)
     inPreviewMode = true
-    TriggerServerEvent('vrs_garage:setPlayerRoutingBucket')
-    Wait(100)
     if previewVehicle then
         DeleteVehicle(previewVehicle)
         previewVehicle = nil
     end
-    ESX.Game.SpawnVehicle(vehicleData.model, vector3(spawn), spawn.w, function(veh)
-        previewVehicle = veh
-        lib.setVehicleProperties(veh, vehicleData)
-        FreezeEntityPosition(veh, true)
-        cam = CreateCamWithParams('DEFAULT_SCRIPTED_CAMERA',
-            GetOffsetFromEntityInWorldCoords(previewVehicle, -3.0, 3.0, 0.5), 0.0, 0.0, GetEntityHeading(veh) - 130.0,
-            60.0)
-        SetCamActive(cam, true)
-        RenderScriptCams(true, true, 1000, true, false)
+    lib.callback('vrs_garage:setPlayerRoutingBucket', false, function(canContinue)
+        if canContinue then
+            ESX.Game.SpawnVehicle(vehicleData.model, vector3(spawn), spawn.w, function(veh)
+                previewVehicle = veh
+                lib.setVehicleProperties(veh, vehicleData)
+                FreezeEntityPosition(veh, true)
+                cam = CreateCamWithParams('DEFAULT_SCRIPTED_CAMERA',
+                    GetOffsetFromEntityInWorldCoords(previewVehicle, -3.0, 3.0, 0.5), 0.0, 0.0, GetEntityHeading(veh) - 130.0,
+                    60.0)
+                SetCamActive(cam, true)
+                RenderScriptCams(true, true, 1000, true, false)
+            end)
+        end
     end)
 end
 
@@ -289,11 +295,14 @@ function ExitPreviewMode()
     if inPreviewMode then
         inPreviewMode = false
         RenderScriptCams(false, true, 1000, true, true)
-        TriggerServerEvent('vrs_garage:setPlayerRoutingBucket', 0)
-        if previewVehicle then
-            DeleteVehicle(previewVehicle)
-            previewVehicle = nil
-        end
+        lib.callback('vrs_garage:setPlayerRoutingBucket', false, function(canContinue)
+            if canContinue then
+                if previewVehicle then
+                    DeleteVehicle(previewVehicle)
+                    previewVehicle = nil
+                end
+            end
+        end, 0)
     end
 end
 
@@ -508,60 +517,57 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
     local ped = PlayerPedId()
     if IsPedInAnyVehicle(ped, false) then
         local currentVehicle = GetVehiclePedIsIn(ped, false)
-        local plate = GetVehicleNumberPlateText(currentVehicle)
-        plate = string.gsub(plate, "%s", "")
-        lib.callback('vrs_garage:checkOwner', false, function(isOwner)
-            if isOwner then
-                lib.callback('vrs_garage:getVehicle', false, function(vehicle)
-                    if zone.job then
-                        if zone.job == vehicle.job and zone.type == vehicle.type then
-                            local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
-                            TaskLeaveVehicle(ped, currentVehicle, 0)
-                            Wait(2000)
-                            TriggerServerEvent('vrs_garage:updateVehicle', plate, vehicleProperties, zone.index, true)
-                            lib.notify({
-                                description = locale('vehicle_stored'),
-                                type = 'success'
-                            })
-                            SetEntityAsMissionEntity(currentVehicle, true, true)
-                            -- NetworkFadeOutEntity(currentVehicle, true, true)
-                            Wait(1000)
-                            DeleteVehicle(currentVehicle)
-                        else
-                            lib.notify({
-                                description = locale('vehicle_not_allowed'),
-                                type = 'error'
-                            })
+        if GetPedInVehicleSeat(currentVehicle, -1) == ped then
+            local plate = GetVehicleNumberPlateText(currentVehicle)
+            lib.callback('vrs_garage:checkOwner', false, function(isOwner)
+                if isOwner then
+                    print('isOwner')
+                    lib.callback('vrs_garage:getVehicle', false, function(vehicle)
+                        if vehicle then
+                            if zone.job then
+                                if zone.job == vehicle.job and zone.type == vehicle.type then
+                                    local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
+                                    TriggerServerEvent('vrs_garage:updateVehicle', plate, vehicleProperties, zone.index, true)
+                                    lib.notify({
+                                        description = locale('vehicle_stored'),
+                                        type = 'success'
+                                    })
+                                    -- NetworkFadeOutEntity(currentVehicle, true, true)
+                                    ESX.Game.DeleteVehicle(currentVehicle)
+                                else
+                                    lib.notify({
+                                        description = locale('vehicle_not_allowed'),
+                                        type = 'error'
+                                    })
+                                end
+                            else
+                                if not vehicle.job and zone.type == vehicle.type then
+                                    local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
+                                    TriggerServerEvent('vrs_garage:updateVehicle', plate, vehicleProperties, zone.index, true)
+                                    lib.notify({
+                                        description = locale('vehicle_stored'),
+                                        type = 'success'
+                                    })
+                                    -- NetworkFadeOutEntity(currentVehicle, true, true)
+                                    -- Wait(1000)
+                                    ESX.Game.DeleteVehicle(currentVehicle)
+                                else
+                                    lib.notify({
+                                        description = locale('vehicle_not_allowed'),
+                                        type = 'error'
+                                    })
+                                end
+                            end
                         end
-                    else
-                        if not vehicle.job and zone.type == vehicle.type then
-                            local vehicleProperties = json.encode(lib.getVehicleProperties(currentVehicle))
-                            TaskLeaveVehicle(ped, currentVehicle, 0)
-                            Wait(2000)
-                            TriggerServerEvent('vrs_garage:updateVehicle', plate, vehicleProperties, zone.index, true)
-                            lib.notify({
-                                description = locale('vehicle_stored'),
-                                type = 'success'
-                            })
-                            SetEntityAsMissionEntity(currentVehicle, true, true)
-                            NetworkFadeOutEntity(currentVehicle, true, true)
-                            Wait(1000)
-                            DeleteVehicle(currentVehicle)
-                        else
-                            lib.notify({
-                                description = locale('vehicle_not_allowed'),
-                                type = 'error'
-                            })
-                        end
-                    end
-                end, plate)
-            else
-                lib.notify({
-                    description = locale('not_owner'),
-                    type = 'error'
-                })
-            end
-        end, plate)
+                    end, plate)
+                else
+                    lib.notify({
+                        description = locale('not_owner'),
+                        type = 'error'
+                    })
+                end
+            end, plate)
+        end
     else
         lib.notify({
             description = locale('not_in_vehicle'),
@@ -840,7 +846,7 @@ for job, vehicles in pairs(Config.JobVehicles) do
     local menuName = 'garage_shop_' .. job
     for name, info in pairs(vehicles) do
         table.insert(options, {
-            title = GetLabelText(GetDisplayNameFromVehicleModel(name)) .. ' ' .. '$' .. info.price,
+            title = GetVehicleName(name) .. ' $' .. info.price,
             icon = 'car',
             arrow = true,
             onSelect = function()
