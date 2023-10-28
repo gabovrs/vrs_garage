@@ -96,6 +96,12 @@ Config.JobVehicles = {
     },
     ['miner'] = {
         ['sadler'] = {price = 1000000},
+    },
+    ['taxi'] = {
+        ['taxi'] = {price = 1000000},
+    },
+    ['mechanic'] = {
+        ['towtruck'] = {price = 1000000},
     }
 }
 
@@ -131,7 +137,7 @@ Config.JobGarajes = {
                     label = locale('ambulance_garage_blip'),
                     sprite = 357,
                     scale = 0.8,
-                    colour = 1
+                    colour = 6
                 },
                 access = vec4(353.1519, -603.6036, 28.7761, 267.1620),
                 store = vec4(365.2415, -591.6791, 28.6921, 343.2072),
@@ -147,9 +153,55 @@ Config.JobGarajes = {
         },
         locations = {
             ['orchardville_miner'] = {
+                blip = {
+                    label = locale('miner_garage_blip'),
+                    sprite = 357,
+                    scale = 0.8,
+                    colour = 5
+                },
                 access = vec4(870.4711, -2366.2339, 30.3462, 356.0012),
                 store = vec4(880.8738, -2350.4807, 30.3312, 87.9480),
                 spawn = vec4(843.8577, -2346.4854, 30.3346, 265.2579),
+                type = 'car'
+            }
+        }
+    },
+    ['taxi'] = {
+        ped = {
+            model = 'u_m_y_proldriver_01',
+            task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT'
+        },
+        locations = {
+            ['tangerine_taxi'] = {
+                blip = {
+                    label = locale('taxi_garage_blip'),
+                    sprite = 357,
+                    scale = 0.8,
+                    colour = 5
+                },
+                access = vec4(918.7134, -160.3715, 74.9114, 142.9251),
+                store = vec4(910.5366, -177.4915, 74.2616, 237.7346),
+                spawn = vec4(902.5016, -184.1103, 73.8883, 332.9777),
+                type = 'car'
+            }
+        }
+    },
+    ['mechanic'] = {
+        ped = {
+            model = 's_m_m_dockwork_01',
+            task = 'WORLD_HUMAN_STAND_MOBILE_UPRIGHT'
+        },
+        locations = {
+            ['olympic_mechanic'] = {
+                blip = {
+                    label = locale('mechanic_garage_blip'),
+                    sprite = 357,
+                    scale = 0.8,
+                    colour = 39
+                },
+                access = vec4(-192.9804, -1290.3110, 31.2965, 272.3626),
+                store = vec4(-182.0340, -1301.9659, 31.2965, 272.7176),
+                spawn = vec4(-160.9252, -1301.6703, 31.3432, 89.9771),
                 type = 'car'
             }
         }
