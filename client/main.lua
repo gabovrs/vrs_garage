@@ -521,7 +521,6 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
             local plate = GetVehicleNumberPlateText(currentVehicle)
             lib.callback('vrs_garage:checkOwner', false, function(isOwner)
                 if isOwner then
-                    print('isOwner')
                     lib.callback('vrs_garage:getVehicle', false, function(vehicle)
                         if vehicle then
                             if zone.job then
@@ -548,8 +547,6 @@ RegisterNetEvent('vrs_garage:access-store', function(zone)
                                         description = locale('vehicle_stored'),
                                         type = 'success'
                                     })
-                                    -- NetworkFadeOutEntity(currentVehicle, true, true)
-                                    -- Wait(1000)
                                     ESX.Game.DeleteVehicle(currentVehicle)
                                 else
                                     lib.notify({
