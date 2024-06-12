@@ -50,6 +50,7 @@ lib.callback.register('vrs_garage:getVehicle', function(source, plate)
 end)
 
 RegisterServerEvent('vrs_garage:updateVehicle', function(plate, vehicle, parking, stored)
+    local plate = string.gsub(plate, ' ', '')
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     CustomSQL('update', 'UPDATE owned_vehicles SET vehicle = ?, parking = ?, stored = ? WHERE REPLACE(plate, " ", "") = ? and owner = ?',
@@ -65,6 +66,7 @@ RegisterServerEvent('vrs_garage:buyVehicle', function(plate, vehicle, parking, j
 end)
 
 RegisterServerEvent('vrs_garage:setVehicleOut', function(plate, stored)
+    local plate = string.gsub(plate, ' ', '')
     local xPlayer = ESX.GetPlayerFromId(source)
     local identifier = xPlayer.getIdentifier()
     CustomSQL('update',
